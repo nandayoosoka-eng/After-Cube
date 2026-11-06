@@ -1,0 +1,40 @@
+name: Build AFTER CUBE APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extract project
+        run: |
+          unzip -q AFTER_CUBE_Phone_APK_Build_v0.3.zip -d source
+
+      - name: Build APK
+        run: |
+          cd source/after_cube_android
+          gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AFTER-CUBE-APK
+          path: source/after_cube_android/app/build/outputs/apk/debug/app-debug.apk
